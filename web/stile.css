@@ -268,10 +268,22 @@ form button[type="submit"]:hover {
 }
 
 /* ============================================================
-   Sezione utenti
+   Esercizio 4 - Sezione utenti
    ============================================================ */
 #ricerca-utenti {
     margin: 10px 0;
     padding: 8px;
     width: 100%;
+}
+
+/* ============================================================
+   Esercizio 5 - Statistiche
+   ============================================================ */
+#statistiche {
+    background: white;
+    border: 1px solid var(--colore-bordo);
+    border-radius: var(--raggio);
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
 }
