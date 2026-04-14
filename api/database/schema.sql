@@ -10,11 +10,17 @@
 --   FOREIGN KEY     → collega una tabella a un'altra
 --   ON DELETE CASCADE → se elimini un utente, i suoi post vengono eliminati automaticamente
 
-CREATE TABLE IF NOT EXISTS utenti (
+CCREATE TABLE IF NOT EXISTS utenti (
     id      INT           NOT NULL AUTO_INCREMENT,
     nome    VARCHAR(100)  NOT NULL,
     email   VARCHAR(100)  NOT NULL,
     citta   VARCHAR(100)  NOT NULL DEFAULT '',
+
+    codiceFiscale CHAR(16) NOT NULL,
+    sesso ENUM('M', 'F', 'Altro') NOT NULL,
+    dataNascita DATE,
+    telefono VARCHAR(20),
+
     PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

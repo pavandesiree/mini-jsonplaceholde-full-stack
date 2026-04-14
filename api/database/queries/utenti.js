@@ -58,13 +58,24 @@ export async function trovaUtentePerId(id) {
  *
  * SQL: INSERT INTO utenti (nome, email, citta) VALUES (?, ?, ?)
  */
-export async function creaUtente({ nome, email, citta }) {
+export async function creaUtente({ nome, email, citta, codiceFiscale, sesso, dataNascita, telefono }) {
     const [risultato] = await pool.query(
-        "INSERT INTO utenti (nome, email, citta) VALUES (?, ?, ?)",
-        [nome, email, citta || ""]
+        `INSERT INTO utenti 
+        (nome, email, citta, codiceFiscale, sesso, dataNascita, telefono) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [nome, email, citta || "", codiceFiscale, sesso, dataNascita || null, telefono || null]
     );
 
-    return { id: risultato.insertId, nome, email, citta: citta || "" };
+    return {
+        id: risultato.insertId,
+        nome,
+        email,
+        citta: citta || "",
+        codiceFiscale,
+        sesso,
+        dataNascita: dataNascita || null,
+        telefono: telefono || null
+    };
 }
 
 // ============================================================
@@ -77,14 +88,19 @@ export async function creaUtente({ nome, email, citta }) {
  *
  * SQL: UPDATE utenti SET nome = ?, email = ?, citta = ? WHERE id = ?
  */
-export async function sostituisciUtente(id, { nome, email, citta }) {
+export async function sostituisciUtente(id, dati) {
+    const { nome, email, citta, codiceFiscale, sesso, dataNascita, telefono } = dati;
+
     const [risultato] = await pool.query(
-        "UPDATE utenti SET nome = ?, email = ?, citta = ? WHERE id = ?",
-        [nome, email, citta || "", id]
+        `UPDATE utenti 
+         SET nome=?, email=?, citta=?, codiceFiscale=?, sesso=?, dataNascita=?, telefono=? 
+         WHERE id=?`,
+        [nome, email, citta || "", codiceFiscale, sesso, dataNascita || null, telefono || null, id]
     );
 
     if (risultato.affectedRows === 0) return null;
-    return { id, nome, email, citta: citta || "" };
+
+    return { id, ...dati };
 }
 
 /**
@@ -94,7 +110,7 @@ export async function sostituisciUtente(id, { nome, email, citta }) {
  * SQL dinamico: UPDATE utenti SET <campo> = ?, ... WHERE id = ?
  */
 export async function aggiornaUtente(id, dati) {
-    const campiPermessi = ["nome", "email", "citta"];
+    const campiPermessi = ["nome", "email", "citta", "codiceFiscale", "sesso", "dataNascita", "telefono"];
     const aggiornamenti = [];
     const valori = [];
 

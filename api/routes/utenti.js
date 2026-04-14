@@ -69,15 +69,23 @@ router.get("/:id", async (req, res) => {
 
 router.post("/", async (req, res) => {
     try {
-        const { nome, email, citta } = req.body;
+        const { nome, email, citta, codiceFiscale, sesso, dataNascita, telefono } = req.body;
 
-        if (!nome || !email) {
+        if (!nome || !email || !codiceFiscale || !sesso) {
             return res.status(400).json({
-                errore: "I campi 'nome' e 'email' sono obbligatori"
+                errore: "Campi obbligatori: nome, email, codiceFiscale, sesso"
             });
         }
-
-        const nuovoUtente = await creaUtente({ nome, email, citta });
+        
+        const nuovoUtente = await creaUtente({
+            nome,
+            email,
+            citta,
+            codiceFiscale,
+            sesso,
+            dataNascita,
+            telefono
+        });
         res.status(201).json(nuovoUtente);
     } catch (errore) {
         console.error("Errore POST /api/utenti:", errore);
@@ -96,15 +104,23 @@ router.post("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
     try {
         const id = parseInt(req.params.id);
-        const { nome, email, citta } = req.body;
+        const { nome, email, citta, codiceFiscale, sesso, dataNascita, telefono } = req.body;
 
-        if (!nome || !email) {
+        if (!nome || !email || !codiceFiscale || !sesso) {
             return res.status(400).json({
-                errore: "I campi 'nome' e 'email' sono obbligatori"
+                errore: "Campi obbligatori: nome, email, codiceFiscale, sesso"
             });
         }
-
-        const aggiornato = await sostituisciUtente(id, { nome, email, citta });
+        
+        const aggiornato = await sostituisciUtente(id, {
+            nome,
+            email,
+            citta,
+            codiceFiscale,
+            sesso,
+            dataNascita,
+            telefono
+        });
 
         if (!aggiornato) {
             return res.status(404).json({
@@ -130,9 +146,17 @@ router.put("/:id", async (req, res) => {
 router.patch("/:id", async (req, res) => {
     try {
         const id = parseInt(req.params.id);
-        const { nome, email, citta } = req.body;
+        const { nome, email, citta, codiceFiscale, sesso, dataNascita, telefono } = req.body;
 
-        const utente = await aggiornaUtente(id, { nome, email, citta });
+        const utente = await aggiornaUtente(id, {
+            nome,
+            email,
+            citta,
+            codiceFiscale,
+            sesso,
+            dataNascita,
+            telefono
+        });
 
         if (!utente) {
             return res.status(404).json({

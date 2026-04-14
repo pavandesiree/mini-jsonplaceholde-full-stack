@@ -3,12 +3,12 @@
 -- Inserisce gli stessi dati che avevamo nel vecchio database.js.
 -- Viene eseguito automaticamente da Docker al primo avvio.
 
-INSERT INTO utenti (id, nome, email, citta) VALUES
-    (1, 'Mario Rossi',    'mario@email.com',  'Roma'),
-    (2, 'Luigi Verdi',    'luigi@email.com',  'Milano'),
-    (3, 'Peach Bianchi',  'peach@email.com',  'Napoli'),
-    (4, 'Toad Gialli',    'toad@email.com',   'Torino'),
-    (5, 'Bowser Neri',    'bowser@email.com', 'Firenze');
+INSERT INTO utenti (id, nome, email, citta, codiceFiscale, sesso, dataNascita, telefono) VALUES
+    (1, 'Mario Rossi',   'mario@email.com',  'Roma',    'RSSMRA90A01H501U', 'M', '1990-01-01', '+391234567890'),
+    (2, 'Luigi Verdi',   'luigi@email.com',  'Milano',  'VRDLGU85B12F205X', 'M', '1985-02-12', '+39111222333'),
+    (3, 'Peach Bianchi', 'peach@email.com',  'Napoli',  'BNCPCH92C23F839Y', 'F', '1992-03-23', '+39333444555'),
+    (4, 'Toad Gialli',   'toad@email.com',   'Torino',  'GLLTDA88D10L219Z', 'Altro', NULL, NULL),
+    (5, 'Bowser Neri',   'bowser@email.com', 'Firenze', 'NRIBWS80E05D612K', 'M', '1980-05-05', '+39999888777');
 
 INSERT INTO post (id, userId, titolo, corpo) VALUES
     (1, 1, 'Il mio primo post',          'Ciao a tutti! Questo è il mio primo post sulla piattaforma.'),
