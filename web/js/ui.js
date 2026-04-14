@@ -47,8 +47,12 @@ export function mostraUtenti(utenti, contenitore, callbacks) {
         card.className = "card";
         card.innerHTML = `
             <h3>${utente.nome}</h3>
-            <p>${utente.email}</p>
-            <p>${utente.citta || "Nessuna citta"}</p>
+            <p>Email: ${utente.email}</p>
+            <p>Città: ${utente.citta || "Nessuna citta"}</p>
+            <p>CF: ${utente.codiceFiscale}</p>
+            <p>Sesso: ${utente.sesso}</p>
+            <p>Data nascita: ${utente.dataNascita || "N/D"}</p>
+            <p>Telefono: ${utente.telefono || "N/D"}</p>
             <div class="azioni">
                 <button class="btn-primario" data-azione="vedi-post">Vedi Post</button>
                 <button class="btn-pericolo" data-azione="elimina">Elimina</button>

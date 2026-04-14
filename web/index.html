@@ -46,6 +46,19 @@
                 <input type="email" id="utente-email" placeholder="Es. yoshi@email.com" required>
                 <label for="utente-citta">Citta (opzionale)</label>
                 <input type="text" id="utente-citta" placeholder="Es. Isola Yoshi">
+                <label for="utente-cf">Codice Fiscale</label>
+                <input type="text" id="utente-cf" placeholder="Es. RSSMRA90A01H501A" pattern="^[A-Za-z]{6}[0-9]{2}[A-Za-z][0-9]{2}[A-Za-z][0-9]{3}[A-Za-z]$" maxlength="16" required>
+                <label for="utente-sesso">Sesso</label>
+                <select id="utente-sesso" required>
+                    <option value="">-- Seleziona --</option>
+                    <option value="M">Maschio</option>
+                    <option value="F">Femmina</option>
+                    <option value="Altro">Altro</option>
+                </select>
+                <label for="utente-dataNascita">Data di nascita</label>
+                <input type="date" id="utente-dataNascita">
+                <label for="utente-telefono">Telefono</label>
+                <input type="tel" id="utente-telefono" placeholder="Es. +391234567890">
                 <button type="submit">Crea Utente</button>
             </form>
 

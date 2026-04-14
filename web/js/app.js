@@ -219,15 +219,40 @@ async function eliminaCommento(id) {
 
 document.getElementById("form-utente").addEventListener("submit", async (e) => {
     e.preventDefault();
+
     const nome = document.getElementById("utente-nome").value.trim();
     const email = document.getElementById("utente-email").value.trim();
     const citta = document.getElementById("utente-citta").value.trim();
 
+    const codiceFiscale = document.getElementById("utente-cf").value.trim();
+    const sesso = document.getElementById("utente-sesso").value;
+    const dataNascita = document.getElementById("utente-dataNascita").value;
+    const telefono = document.getElementById("utente-telefono").value.trim();
+
+    // Validazione Codice Fiscale
+    const regexCF = /^[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9]{3}[A-Z]$/;
+    const cfUppercase = codiceFiscale.toUpperCase();
+
+    if (!regexCF.test(cfUppercase)) {
+        ui.mostraErrore("Codice fiscale non valido", liste.utenti);
+        return;
+    }
+
     try {
-        await api.creaUtente({ nome, email, citta });
+        await api.creaUtente({
+            nome,
+            email,
+            citta,
+            codiceFiscale: cfUppercase,
+            sesso,
+            dataNascita: dataNascita || null,
+            telefono: telefono || null
+        });
+
         e.target.reset();
         await caricaUtenti();
         await aggiornaStatistiche();
+
     } catch (err) {
         ui.mostraErrore(err.message, liste.utenti);
     }
