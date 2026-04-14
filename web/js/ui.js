@@ -25,15 +25,25 @@ function mostraVuoto(contenitore, testo) {
     contenitore.innerHTML = `<p class="vuoto">${testo}</p>`;
 }
 
+// ✅ NUOVO: helper per formattare le date
+function formattaData(dataInput) {
+    if (!dataInput) return "N/D";
+
+    const data = new Date(dataInput);
+
+    if (isNaN(data)) return "N/D";
+
+    return data.toLocaleDateString("it-IT", {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+    });
+}
+
 // ============================================================
 // Utenti
 // ============================================================
 
-/**
- * @param {Array} utenti
- * @param {HTMLElement} contenitore
- * @param {{ onVediPost: Function, onElimina: Function }} callbacks
- */
 export function mostraUtenti(utenti, contenitore, callbacks) {
     pulisciContenitore(contenitore);
 
@@ -51,7 +61,7 @@ export function mostraUtenti(utenti, contenitore, callbacks) {
             <p>Città: ${utente.citta || "Nessuna citta"}</p>
             <p>CF: ${utente.codiceFiscale}</p>
             <p>Sesso: ${utente.sesso}</p>
-            <p>Data nascita: ${utente.dataNascita || "N/D"}</p>
+            <p>Data nascita: ${formattaData(utente.dataNascita)}</p>
             <p>Telefono: ${utente.telefono || "N/D"}</p>
             <div class="azioni">
                 <button class="btn-primario" data-azione="vedi-post">Vedi Post</button>
@@ -75,11 +85,6 @@ export function mostraUtenti(utenti, contenitore, callbacks) {
 // Post
 // ============================================================
 
-/**
- * @param {Array} post
- * @param {HTMLElement} contenitore
- * @param {{ onVediCommenti: Function, onElimina: Function }} callbacks
- */
 export function mostraPost(post, contenitore, callbacks) {
     pulisciContenitore(contenitore);
 
@@ -94,6 +99,7 @@ export function mostraPost(post, contenitore, callbacks) {
         card.innerHTML = `
             <h3>${p.titolo}</h3>
             <p>${p.corpo}</p>
+            ${p.creatoIl ? `<p>Creato il: ${formattaData(p.creatoIl)}</p>` : ""}
             <div class="azioni">
                 <button class="btn-primario" data-azione="vedi-commenti">Vedi Commenti</button>
                 <button class="btn-pericolo" data-azione="elimina">Elimina</button>
@@ -116,11 +122,6 @@ export function mostraPost(post, contenitore, callbacks) {
 // Commenti
 // ============================================================
 
-/**
- * @param {Array} commenti
- * @param {HTMLElement} contenitore
- * @param {{ onElimina: Function }} callbacks
- */
 export function mostraCommenti(commenti, contenitore, callbacks) {
     pulisciContenitore(contenitore);
 
@@ -136,6 +137,7 @@ export function mostraCommenti(commenti, contenitore, callbacks) {
             <h3>${c.nome}</h3>
             <p>${c.email}</p>
             <p>${c.corpo}</p>
+            ${c.creatoIl ? `<p>Creato il: ${formattaData(c.creatoIl)}</p>` : ""}
             <div class="azioni">
                 <button class="btn-pericolo" data-azione="elimina">Elimina</button>
             </div>
