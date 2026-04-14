@@ -266,3 +266,12 @@ form button[type="submit"]:hover {
     padding: 2rem;
     font-size: 0.9375rem;
 }
+
+/* ============================================================
+   Sezione utenti
+   ============================================================ */
+#ricerca-utenti {
+    margin: 10px 0;
+    padding: 8px;
+    width: 100%;
+}

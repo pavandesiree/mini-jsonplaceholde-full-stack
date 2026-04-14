@@ -257,3 +257,16 @@ document.getElementById("form-commento").addEventListener("submit", async (e) =>
 // ============================================================
 
 caricaUtenti();
+
+// ============================================================
+// Esercizio 4 - Filtro di ricerca utenti
+// ============================================================
+document.getElementById("ricerca-utenti").addEventListener("input", (e) => {
+    const testo = e.target.value.toLowerCase();
+    const cards = document.querySelectorAll("#lista-utenti .card");
+
+    cards.forEach(card => {
+        const contenuto = card.textContent.toLowerCase();
+        card.style.display = contenuto.includes(testo) ? "" : "none";
+    });
+});
