@@ -25,7 +25,7 @@ function mostraVuoto(contenitore, testo) {
     contenitore.innerHTML = `<p class="vuoto">${testo}</p>`;
 }
 
-// ✅ NUOVO: helper per formattare le date
+// Helper per formattare le date
 function formattaData(dataInput) {
     if (!dataInput) return "N/D";
 
