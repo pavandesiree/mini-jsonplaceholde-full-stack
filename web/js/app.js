@@ -11,6 +11,8 @@ import * as ui from "./ui.js";
 
 let utenteSelezionato = null;   // { id, nome }
 let postSelezionato = null;     // { id, titolo }
+let paginaCorrentePost = 1;
+let limitePost = 5;
 
 // ============================================================
 // Esercizio 3 - Stato modifica utente
@@ -96,6 +98,7 @@ navBottoni.utenti.addEventListener("click", async () => {
 });
 
 navBottoni.post.addEventListener("click", async () => {
+    paginaCorrentePost = 1;
     utenteSelezionato = null;
     breadcrumbs.post.innerHTML = "";
     titoli.post.textContent = "Post";
@@ -132,11 +135,15 @@ async function caricaUtenti() {
 
 async function caricaPost(userId) {
     try {
-        const post = await api.ottieniPost(userId);
-        ui.mostraPost(post, liste.post, {
+        const risposta = await api.ottieniPost(userId, paginaCorrentePost, limitePost);
+
+        ui.mostraPost(risposta.dati, liste.post, {
             onVediCommenti: vediCommentiDiPost,
             onElimina: eliminaPost,
         });
+
+        renderPaginazione(risposta);
+
     } catch (err) {
         ui.mostraErrore(err.message, liste.post);
     }
@@ -174,6 +181,7 @@ async function aggiornaStatistiche() {
 // ============================================================
 
 async function vediPostDiUtente(utente) {
+    paginaCorrentePost = 1;
     utenteSelezionato = { id: utente.id, nome: utente.nome };
     titoli.post.textContent = `Post di ${utente.nome}`;
     breadcrumbs.post.innerHTML = `<a id="torna-utenti">Utenti</a> &rarr; Post di ${utente.nome}`;
@@ -366,3 +374,32 @@ document.getElementById("ricerca-utenti").addEventListener("input", (e) => {
         card.style.display = contenuto.includes(testo) ? "" : "none";
     });
 });
+
+// ============================================================
+// Esercizio 7 - Paginazione API
+// ============================================================
+function renderPaginazione({ pagina, pagine }) {
+    let container = document.getElementById("paginazione-post");
+
+    if (!container) {
+        container = document.createElement("div");
+        container.id = "paginazione-post";
+        liste.post.after(container);
+    }
+
+    container.innerHTML = `
+        <button id="prev-post" ${pagina <= 1 ? "disabled" : ""}>Precedente</button>
+        <span> Pagina ${pagina} di ${pagine} </span>
+        <button id="next-post" ${pagina >= pagine ? "disabled" : ""}>Successiva</button>
+    `;
+
+    document.getElementById("prev-post")?.addEventListener("click", async () => {
+        paginaCorrentePost--;
+        await caricaPost(utenteSelezionato?.id);
+    });
+
+    document.getElementById("next-post")?.addEventListener("click", async () => {
+        paginaCorrentePost++;
+        await caricaPost(utenteSelezionato?.id);
+    });
+}

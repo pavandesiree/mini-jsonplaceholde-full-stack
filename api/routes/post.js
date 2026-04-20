@@ -22,9 +22,27 @@ const router = Router();
 
 router.get("/", async (req, res) => {
     try {
-        const { userId } = req.query;
-        const risultato = await trovaPost(userId ? parseInt(userId) : undefined);
-        res.json(risultato);
+        const { userId, pagina = 1, limite = 5 } = req.query;
+
+        const paginaNum = parseInt(pagina);
+        const limiteNum = parseInt(limite);
+        const offset = (paginaNum - 1) * limiteNum;
+
+        const risultato = await trovaPost(
+            userId ? parseInt(userId) : undefined,
+            limiteNum,
+            offset
+        );
+
+        const pagine = Math.ceil(risultato.totale / limiteNum);
+
+        res.json({
+            dati: risultato.dati,
+            pagina: paginaNum,
+            limite: limiteNum,
+            totale: risultato.totale,
+            pagine
+        });
     } catch (errore) {
         console.error("Errore GET /api/post:", errore);
         res.status(500).json({ errore: "Errore interno del server" });

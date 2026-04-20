@@ -14,17 +14,36 @@ import pool from "../connessione.js";
  * SQL senza filtro:  SELECT * FROM post
  * SQL con filtro:    SELECT * FROM post WHERE userId = ?
  */
-export async function trovaPost(userId) {
+export async function trovaPost(userId, limite = 10, offset = 0) {
+    let righe;
+    let totale;
+
     if (userId) {
-        const [righe] = await pool.query(
-            "SELECT * FROM post WHERE userId = ?",
+        const [rows] = await pool.query(
+            "SELECT * FROM post WHERE userId = ? LIMIT ? OFFSET ?",
+            [userId, limite, offset]
+        );
+        righe = rows;
+
+        const [count] = await pool.query(
+            "SELECT COUNT(*) as totale FROM post WHERE userId = ?",
             [userId]
         );
-        return righe;
+        totale = count[0].totale;
+    } else {
+        const [rows] = await pool.query(
+            "SELECT * FROM post LIMIT ? OFFSET ?",
+            [limite, offset]
+        );
+        righe = rows;
+
+        const [count] = await pool.query(
+            "SELECT COUNT(*) as totale FROM post"
+        );
+        totale = count[0].totale;
     }
 
-    const [righe] = await pool.query("SELECT * FROM post");
-    return righe;
+    return { dati: righe, totale };
 }
 
 /**
