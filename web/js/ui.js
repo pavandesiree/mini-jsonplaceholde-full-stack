@@ -65,12 +65,17 @@ export function mostraUtenti(utenti, contenitore, callbacks) {
             <p>Telefono: ${utente.telefono || "N/D"}</p>
             <div class="azioni">
                 <button class="btn-primario" data-azione="vedi-post">Vedi Post</button>
+                <button class="btn-secondario" data-azione="modifica">Modifica</button>
                 <button class="btn-pericolo" data-azione="elimina">Elimina</button>
             </div>
         `;
 
         card.querySelector('[data-azione="vedi-post"]').addEventListener("click", () => {
             callbacks.onVediPost(utente);
+        });
+
+        card.querySelector('[data-azione="modifica"]').addEventListener("click", () => {
+            callbacks.onModifica(utente.id);
         });
 
         card.querySelector('[data-azione="elimina"]').addEventListener("click", () => {

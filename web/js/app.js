@@ -13,6 +13,12 @@ let utenteSelezionato = null;   // { id, nome }
 let postSelezionato = null;     // { id, titolo }
 
 // ============================================================
+// Esercizio 3 - Stato modifica utente
+// ============================================================
+
+let utenteInModifica = null;
+
+// ============================================================
 // Riferimenti DOM
 // ============================================================
 
@@ -43,6 +49,34 @@ const titoli = {
     post: document.getElementById("titolo-post"),
     commenti: document.getElementById("titolo-commenti"),
 };
+
+// ============================================================
+// Esercizio 3 - Funzioni modifica utente
+// ============================================================
+function attivaModificaUtente(utente) {
+    utenteInModifica = utente;
+
+    document.getElementById("utente-nome").value = utente.nome;
+    document.getElementById("utente-email").value = utente.email;
+    document.getElementById("utente-citta").value = utente.citta || "";
+    document.getElementById("utente-cf").value = utente.codiceFiscale || "";
+    document.getElementById("utente-sesso").value = utente.sesso || "";
+    document.getElementById("utente-dataNascita").value = utente.dataNascita || "";
+    document.getElementById("utente-telefono").value = utente.telefono || "";
+
+    document.querySelector("#form-utente button[type='submit']").textContent = "Aggiorna utente";
+    document.querySelector("#form-utente h3")?.textContent = "Modifica utente";
+}
+
+function resetFormUtente() {
+    utenteInModifica = null;
+
+    const form = document.getElementById("form-utente");
+    form.reset();
+
+    document.querySelector("#form-utente button[type='submit']").textContent = "Crea utente";
+    document.querySelector("#form-utente h3")?.textContent = "Nuovo utente";
+}
 
 // ============================================================
 // Navigazione
@@ -89,6 +123,7 @@ async function caricaUtenti() {
         ui.mostraUtenti(utenti, liste.utenti, {
             onVediPost: vediPostDiUtente,
             onElimina: eliminaUtente,
+            onModifica: attivaModificaUtente // AGGIUNTA
         });
     } catch (err) {
         ui.mostraErrore(err.message, liste.utenti);
@@ -239,17 +274,31 @@ document.getElementById("form-utente").addEventListener("submit", async (e) => {
     }
 
     try {
-        await api.creaUtente({
-            nome,
-            email,
-            citta,
-            codiceFiscale: cfUppercase,
-            sesso,
-            dataNascita: dataNascita || null,
-            telefono: telefono || null
-        });
+        if (utenteInModifica) {
+            await api.aggiornaUtente(utenteInModifica.id, {
+                nome,
+                email,
+                citta,
+                codiceFiscale: cfUppercase,
+                sesso,
+                dataNascita: dataNascita || null,
+                telefono: telefono || null
+            });
+            utenteInModifica = null;
+            resetFormUtente();
+        } else {
+            await api.creaUtente({
+                nome,
+                email,
+                citta,
+                codiceFiscale: cfUppercase,
+                sesso,
+                dataNascita: dataNascita || null,
+                telefono: telefono || null
+            });
+        }
 
-        e.target.reset();
+        resetFormUtente();
         await caricaUtenti();
         await aggiornaStatistiche();
 
@@ -267,7 +316,6 @@ document.getElementById("form-post").addEventListener("submit", async (e) => {
     try {
         await api.creaPost({ userId, titolo, corpo });
         e.target.reset();
-        // Mantieni il userId pre-compilato se in drill-down
         if (utenteSelezionato) {
             document.getElementById("post-userId").value = utenteSelezionato.id;
         }
@@ -288,7 +336,6 @@ document.getElementById("form-commento").addEventListener("submit", async (e) =>
     try {
         await api.creaCommento({ postId, nome, email, corpo });
         e.target.reset();
-        // Mantieni il postId pre-compilato se in drill-down
         if (postSelezionato) {
             document.getElementById("commento-postId").value = postSelezionato.id;
         }
@@ -309,6 +356,7 @@ aggiornaStatistiche();
 // ============================================================
 // Esercizio 4 - Filtro di ricerca utenti
 // ============================================================
+
 document.getElementById("ricerca-utenti").addEventListener("input", (e) => {
     const testo = e.target.value.toLowerCase();
     const cards = document.querySelectorAll("#lista-utenti .card");

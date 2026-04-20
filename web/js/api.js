@@ -43,6 +43,13 @@ export async function eliminaUtente(id) {
     return chiamataApi(`/utenti/${id}`, { method: "DELETE" });
 }
 
+export async function aggiornaUtente(id, dati) {
+    return chiamataApi(`/utenti/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(dati),
+    });
+}
+
 // ============================================================
 // Post
 // ============================================================
