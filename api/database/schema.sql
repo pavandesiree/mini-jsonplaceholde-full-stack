@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS utenti (
     id      INT           NOT NULL AUTO_INCREMENT,
     nome    VARCHAR(100)  NOT NULL,
     email   VARCHAR(100)  NOT NULL,
+    password VARCHAR(255) NOT NULL,
     citta   VARCHAR(100)  NOT NULL DEFAULT '',
     codiceFiscale CHAR(16) NOT NULL,
     sesso ENUM('M', 'F', 'Altro') NOT NULL,
