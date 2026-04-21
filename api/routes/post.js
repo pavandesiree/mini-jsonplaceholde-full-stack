@@ -9,6 +9,7 @@ import {
     trovaPost, trovaPostPerId, creaPost,
     sostituisciPost, aggiornaPost, eliminaPost
 } from "../database/queries/post.js";
+import { richiediAutenticazione } from "../middleware/autenticazione.js";
 
 const router = Router();
 
@@ -76,7 +77,7 @@ router.get("/:id", async (req, res) => {
 // ============================================================
 // Campi obbligatori nel body: "userId", "titolo", "corpo"
 
-router.post("/", async (req, res) => {
+router.post("/", richiediAutenticazione, async (req, res) => {
     try {
         const { userId, titolo, corpo } = req.body;
 
@@ -99,7 +100,7 @@ router.post("/", async (req, res) => {
 // ============================================================
 // Campi obbligatori nel body: "userId", "titolo", "corpo"
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", richiediAutenticazione, async (req, res) => {
     try {
         const id = parseInt(req.params.id);
         const { userId, titolo, corpo } = req.body;
@@ -129,7 +130,7 @@ router.put("/:id", async (req, res) => {
 // PATCH /api/post/:id — Aggiorna parzialmente
 // ============================================================
 
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", richiediAutenticazione, async (req, res) => {
     try {
         const id = parseInt(req.params.id);
         const { userId, titolo, corpo } = req.body;
@@ -155,7 +156,7 @@ router.patch("/:id", async (req, res) => {
 // Nota: grazie a ON DELETE CASCADE, eliminando un post
 // vengono eliminati automaticamente anche i suoi commenti.
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", richiediAutenticazione, async (req, res) => {
     try {
         const id = parseInt(req.params.id);
         const rimosso = await eliminaPost(id);

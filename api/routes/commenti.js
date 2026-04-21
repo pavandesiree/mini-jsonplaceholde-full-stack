@@ -9,6 +9,7 @@ import {
     trovaCommenti, trovaCommentoPerId, creaCommento,
     sostituisciCommento, aggiornaCommento, eliminaCommento
 } from "../database/queries/commenti.js";
+import { richiediAutenticazione } from "../middleware/autenticazione.js";
 
 const router = Router();
 
@@ -55,7 +56,7 @@ router.get("/:id", async (req, res) => {
 // ============================================================
 // Campi obbligatori nel body: "postId", "nome", "email", "corpo"
 
-router.post("/", async (req, res) => {
+router.post("/", richiediAutenticazione, async (req, res) => {
     try {
         const { postId, nome, email, corpo } = req.body;
 
@@ -78,7 +79,7 @@ router.post("/", async (req, res) => {
 // ============================================================
 // Campi obbligatori nel body: "postId", "nome", "email", "corpo"
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", richiediAutenticazione, async (req, res) => {
     try {
         const id = parseInt(req.params.id);
         const { postId, nome, email, corpo } = req.body;
@@ -108,7 +109,7 @@ router.put("/:id", async (req, res) => {
 // PATCH /api/commenti/:id — Aggiorna parzialmente
 // ============================================================
 
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", richiediAutenticazione, async (req, res) => {
     try {
         const id = parseInt(req.params.id);
         const { postId, nome, email, corpo } = req.body;
@@ -132,7 +133,7 @@ router.patch("/:id", async (req, res) => {
 // DELETE /api/commenti/:id — Elimina un commento
 // ============================================================
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", richiediAutenticazione, async (req, res) => {
     try {
         const id = parseInt(req.params.id);
         const rimosso = await eliminaCommento(id);
