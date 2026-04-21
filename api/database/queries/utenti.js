@@ -51,6 +51,17 @@ export async function trovaUtentePerId(id) {
     return righe[0];
 }
 
+export async function trovaUtentePerEmail(email) {
+    const [righe] = await pool.query(
+        `SELECT id, nome, email, password, citta, codiceFiscale, sesso, dataNascita, telefono, creatoIl 
+         FROM utenti 
+         WHERE email = ?`,
+        [email]
+    );
+
+    return righe[0]; // undefined se non esiste
+}
+
 // ============================================================
 // INSERT — Creazione
 // ============================================================
@@ -66,7 +77,7 @@ export async function creaUtente({ nome, email, password, citta, codiceFiscale, 
     const [risultato] = await pool.query(
         `INSERT INTO utenti 
         (nome, email, password, citta, codiceFiscale, sesso, dataNascita, telefono) 
-        VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         [nome, email, hash, citta || "", codiceFiscale, sesso, dataNascita || null, telefono || null]
     );
 
