@@ -53,6 +53,36 @@ const titoli = {
 };
 
 // ============================================================
+// Esercizio 11 - Funzioni Login-Logout
+// ============================================================
+document.getElementById("form-login").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("login-email").value;
+    const password = document.getElementById("login-password").value;
+    try {
+        const { token, utente } = await api.login(email, password);
+        localStorage.setItem("token", token);
+        localStorage.setItem("utente", JSON.stringify(utente));
+        aggiornaStatoLogin();
+    } catch (errore) {
+        alert("Login fallito: " + errore.message);
+    }
+});
+
+function logout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("utente");
+    aggiornaStatoLogin();
+}
+
+function aggiornaStatoLogin() {
+    const utente = JSON.parse(localStorage.getItem("utente") || "null");
+    document.getElementById("stato-login").textContent = utente
+        ? `Loggato come ${utente.nome}`
+        : "Non sei autenticato";
+}
+
+// ============================================================
 // Esercizio 3 - Funzioni modifica utente
 // ============================================================
 function attivaModificaUtente(utente) {
@@ -114,6 +144,10 @@ navBottoni.commenti.addEventListener("click", async () => {
     document.getElementById("commento-postId").value = "";
     mostraSezione("commenti");
     await caricaCommenti();
+});
+
+document.getElementById("nav-logout").addEventListener("click", () => {
+    logout();
 });
 
 // ============================================================

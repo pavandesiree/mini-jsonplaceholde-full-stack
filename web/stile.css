@@ -94,6 +94,16 @@ nav button.attivo {
     color: white;
 }
 
+nav #nav-logout {
+    border-color: #dc2626;
+}
+
+nav #nav-logout:hover {
+    border-color: var(--colore-pericolo-scuro);
+    background-color: #dc2626;
+    color: white;
+}
+
 /* ============================================================
    Sezioni e visibilità
    ============================================================ */
