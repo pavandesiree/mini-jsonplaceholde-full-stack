@@ -67,8 +67,8 @@ function attivaModificaUtente(utente) {
     document.getElementById("utente-telefono").value = utente.telefono || "";
 
     document.querySelector("#form-utente button[type='submit']").textContent = "Aggiorna utente";
-    document.querySelector("#form-utente h3")?.textContent = "Modifica utente";
-}
+    const h3Form = document.querySelector("#form-utente h3");
+    if (h3Form) h3Form.textContent = "Modifica utente";}
 
 function resetFormUtente() {
     utenteInModifica = null;
@@ -77,8 +77,8 @@ function resetFormUtente() {
     form.reset();
 
     document.querySelector("#form-utente button[type='submit']").textContent = "Crea utente";
-    document.querySelector("#form-utente h3")?.textContent = "Nuovo utente";
-}
+    const h3Form = document.querySelector("#form-utente h3");
+    if (h3Form) h3Form.textContent = "Nuovo utente";}
 
 // ============================================================
 // Navigazione
@@ -170,7 +170,7 @@ async function aggiornaStatistiche() {
         ]);
 
         document.getElementById("statistiche").textContent =
-            `Utenti: ${utenti.length} | Post: ${post.length} | Commenti: ${commenti.length}`;
+        `Utenti: ${utenti.length} | Post: ${post.totale} | Commenti: ${commenti.length}`;
     } catch (err) {
         console.error("Errore statistiche:", err);
     }

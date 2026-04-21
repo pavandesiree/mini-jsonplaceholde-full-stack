@@ -54,9 +54,12 @@ export async function aggiornaUtente(id, dati) {
 // Post
 // ============================================================
 
-export async function ottieniPost(userId) {
-    const query = userId ? `?userId=${userId}` : "";
-    return chiamataApi(`/post${query}`);
+export async function ottieniPost(userId, pagina = 1, limite = 5) {
+    const params = new URLSearchParams();
+    if (userId) params.append("userId", userId);
+    params.append("pagina", pagina);
+    params.append("limite", limite);
+    return chiamataApi(`/post?${params.toString()}`);
 }
 
 export async function creaPost(dati) {

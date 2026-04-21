@@ -3,12 +3,12 @@
 -- Inserisce gli stessi dati che avevamo nel vecchio database.js.
 -- Viene eseguito automaticamente da Docker al primo avvio.
 
-INSERT INTO utenti (id, nome, email, password, citta, codiceFiscale, sesso, dataNascita, telefono) VALUES
-    (1, 'Mario Rossi',   'mario@email.com', '$2b$10$j/CfHe3IvCpDZFW4sBxRFewPA7uFVC4QWV3rLBsPYfVla80NwBnSq',  'Roma',    'RSSMRA90A01H501U', 'M', '1990-01-01', '+391234567890'),
-    (2, 'Luigi Verdi',   'luigi@email.com', '$2b$10$Hvpkyoe5iUjcBkRJEyR9we.EDsZiWRcUrUXW9tH4goKF9v8Zckz3S',  'Milano',  'VRDLGU85B12F205X', 'M', '1985-02-12', '+39111222333'),
-    (3, 'Peach Bianchi', 'peach@email.com', '$2b$10$Aj.B5eVwqFVltBGxtXaoT.GsU9KZYUOnuSZyAEMHwgdKFxesQY7IC',  'Napoli',  'BNCPCH92C23F839Y', 'F', '1992-03-23', '+39333444555'),
-    (4, 'Toad Gialli',   'toad@email.com', '$2b$10$Ku8QKT.GWCr2mwiLidRTKu0ttzOiO9bA3Qm1HjtigZdtvmWhliVCO',   'Torino',  'GLLTDA88D10L219Z', 'Altro', NULL, NULL),
-    (5, 'Bowser Neri',   'bowser@email.com', '$2b$10$39gWixQlpIgjRU.K7SBpOOi9ro9Ev7lBIqYqO4C3lFm9GJpKKtlWu', 'Firenze', 'NRIBWS80E05D612K', 'M', '1980-05-05', '+39999888777');
+INSERT INTO utenti (id, nome, email, password, citta, codiceFiscale, sesso, dataNascita, telefono, creatoIl) VALUES
+    (1, 'Mario Rossi',   'mario@email.com', '$2b$10$j/CfHe3IvCpDZFW4sBxRFewPA7uFVC4QWV3rLBsPYfVla80NwBnSq',  'Roma',    'RSSMRA90A01H501U', 'M', '1990-01-01', '+391234567890', NULL),
+    (2, 'Luigi Verdi',   'luigi@email.com', '$2b$10$Hvpkyoe5iUjcBkRJEyR9we.EDsZiWRcUrUXW9tH4goKF9v8Zckz3S',  'Milano',  'VRDLGU85B12F205X', 'M', '1985-02-12', '+39111222333', NULL),
+    (3, 'Peach Bianchi', 'peach@email.com', '$2b$10$Aj.B5eVwqFVltBGxtXaoT.GsU9KZYUOnuSZyAEMHwgdKFxesQY7IC',  'Napoli',  'BNCPCH92C23F839Y', 'F', '1992-03-23', '+39333444555', NULL),
+    (4, 'Toad Gialli',   'toad@email.com', '$2b$10$Ku8QKT.GWCr2mwiLidRTKu0ttzOiO9bA3Qm1HjtigZdtvmWhliVCO',   'Torino',  'GLLTDA88D10L219Z', 'Altro', NULL, NULL, NULL),
+    (5, 'Bowser Neri',   'bowser@email.com', '$2b$10$39gWixQlpIgjRU.K7SBpOOi9ro9Ev7lBIqYqO4C3lFm9GJpKKtlWu', 'Firenze', 'NRIBWS80E05D612K', 'M', '1980-05-05', '+39999888777', NULL);
 
 INSERT INTO post (id, userId, titolo, corpo) VALUES
     (1, 1, 'Il mio primo post',          'Ciao a tutti! Questo è il mio primo post sulla piattaforma.'),

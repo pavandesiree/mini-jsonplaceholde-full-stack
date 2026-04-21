@@ -75,7 +75,7 @@ export function mostraUtenti(utenti, contenitore, callbacks) {
         });
 
         card.querySelector('[data-azione="modifica"]').addEventListener("click", () => {
-            callbacks.onModifica(utente.id);
+            callbacks.onModifica(utente);
         });
 
         card.querySelector('[data-azione="elimina"]').addEventListener("click", () => {

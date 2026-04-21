@@ -69,17 +69,24 @@ router.get("/:id", async (req, res) => {
 
 router.post("/", async (req, res) => {
     try {
-        const { nome, email, citta, codiceFiscale, sesso, dataNascita, telefono } = req.body;
+        const { nome, email, password, citta, codiceFiscale, sesso, dataNascita, telefono } = req.body;
 
-        if (!nome || !email || !codiceFiscale || !sesso) {
+        if (!nome || !email || !password || !codiceFiscale || !sesso) {
             return res.status(400).json({
-                errore: "Campi obbligatori: nome, email, codiceFiscale, sesso"
+                errore: "Campi obbligatori: nome, email, password, codiceFiscale, sesso"
             });
         }
+
+        if (password.length < 8) {
+        return res.status(400).json({
+            errore: "La password deve essere di almeno 8 caratteri"
+        });
+}
         
         const nuovoUtente = await creaUtente({
             nome,
             email,
+            password,
             citta,
             codiceFiscale,
             sesso,

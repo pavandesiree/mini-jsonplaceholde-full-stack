@@ -10,6 +10,7 @@
 //   risultato.affectedRows     → quante righe sono state modificate da UPDATE/DELETE
 
 import pool from "../connessione.js";
+import bcrypt from "bcrypt";
 
 // ============================================================
 // SELECT — Lettura
@@ -24,13 +25,15 @@ import pool from "../connessione.js";
 export async function trovaUtenti(citta) {
     if (citta) {
         const [righe] = await pool.query(
-            "SELECT * FROM utenti WHERE LOWER(citta) = LOWER(?)",
+            "SELECT id, nome, email, citta, codiceFiscale, sesso, dataNascita, telefono, creatoIl FROM utenti WHERE LOWER(citta) = LOWER(?)",
             [citta]
         );
         return righe;
     }
 
-    const [righe] = await pool.query("SELECT * FROM utenti");
+    const [righe] = await pool.query(
+        "SELECT id, nome, email, citta, codiceFiscale, sesso, dataNascita, telefono, creatoIl FROM utenti"
+    );
     return righe;
 }
 
@@ -42,10 +45,10 @@ export async function trovaUtenti(citta) {
  */
 export async function trovaUtentePerId(id) {
     const [righe] = await pool.query(
-        "SELECT * FROM utenti WHERE id = ?",
+        "SELECT id, nome, email, citta, codiceFiscale, sesso, dataNascita, telefono, creatoIl FROM utenti WHERE id = ?",
         [id]
     );
-    return righe[0]; // undefined se non trovato
+    return righe[0];
 }
 
 // ============================================================
@@ -58,12 +61,13 @@ export async function trovaUtentePerId(id) {
  *
  * SQL: INSERT INTO utenti (nome, email, citta) VALUES (?, ?, ?)
  */
-export async function creaUtente({ nome, email, citta, codiceFiscale, sesso, dataNascita, telefono }) {
+export async function creaUtente({ nome, email, password, citta, codiceFiscale, sesso, dataNascita, telefono }) {
+    const hash = await bcrypt.hash(password, 10);
     const [risultato] = await pool.query(
         `INSERT INTO utenti 
-        (nome, email, citta, codiceFiscale, sesso, dataNascita, telefono) 
+        (nome, email, password, citta, codiceFiscale, sesso, dataNascita, telefono) 
         VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [nome, email, citta || "", codiceFiscale, sesso, dataNascita || null, telefono || null]
+        [nome, email, hash, citta || "", codiceFiscale, sesso, dataNascita || null, telefono || null]
     );
 
     return {
