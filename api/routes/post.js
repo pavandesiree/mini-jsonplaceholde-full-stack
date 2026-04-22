@@ -111,14 +111,18 @@ router.put("/:id", richiediAutenticazione, async (req, res) => {
             });
         }
 
-        const aggiornato = await sostituisciPost(id, { userId, titolo, corpo });
-
-        if (!aggiornato) {
-            return res.status(404).json({
-                errore: `Post con id ${id} non trovato`
-            });
+        const post = await trovaPostPerId(id);
+        if (!post) {
+            return res.status(404).json({ errore: `Post con id ${id} non trovato` });
         }
 
+        const isAutore = post.userId === req.utente.id;
+        const isAdmin  = req.utente.ruolo === "admin";
+        if (!isAutore && !isAdmin) {
+            return res.status(403).json({ errore: "Puoi modificare solo i tuoi post" });
+        }
+
+        const aggiornato = await sostituisciPost(id, { userId, titolo, corpo });
         res.json(aggiornato);
     } catch (errore) {
         console.error("Errore PUT /api/post/:id:", errore);
@@ -135,14 +139,18 @@ router.patch("/:id", richiediAutenticazione, async (req, res) => {
         const id = parseInt(req.params.id);
         const { userId, titolo, corpo } = req.body;
 
-        const elemento = await aggiornaPost(id, { userId, titolo, corpo });
-
-        if (!elemento) {
-            return res.status(404).json({
-                errore: `Post con id ${id} non trovato`
-            });
+        const post = await trovaPostPerId(id);
+        if (!post) {
+            return res.status(404).json({ errore: `Post con id ${id} non trovato` });
         }
 
+        const isAutore = post.userId === req.utente.id;
+        const isAdmin  = req.utente.ruolo === "admin";
+        if (!isAutore && !isAdmin) {
+            return res.status(403).json({ errore: "Puoi modificare solo i tuoi post" });
+        }
+
+        const elemento = await aggiornaPost(id, { userId, titolo, corpo });
         res.json(elemento);
     } catch (errore) {
         console.error("Errore PATCH /api/post/:id:", errore);
@@ -157,21 +165,17 @@ router.patch("/:id", richiediAutenticazione, async (req, res) => {
 // vengono eliminati automaticamente anche i suoi commenti.
 
 router.delete("/:id", richiediAutenticazione, async (req, res) => {
-    try {
-        const id = parseInt(req.params.id);
-        const rimosso = await eliminaPost(id);
+    const post = await trovaPostPerId(req.params.id);
+    if (!post) return res.status(404).json({ errore: "Post non trovato" });
 
-        if (!rimosso) {
-            return res.status(404).json({
-                errore: `Post con id ${id} non trovato`
-            });
-        }
-
-        res.json({ messaggio: "Post eliminato", post: rimosso });
-    } catch (errore) {
-        console.error("Errore DELETE /api/post/:id:", errore);
-        res.status(500).json({ errore: "Errore interno del server" });
+    const isAutore = post.userId === req.utente.id;
+    const isAdmin = req.utente.ruolo === "admin";
+    if (!isAutore && !isAdmin) {
+        return res.status(403).json({ errore: "Puoi modificare solo i tuoi post" });
     }
+
+    await eliminaPost(req.params.id);
+    res.json({ messaggio: "Post eliminato", post });
 });
 
 export default router;

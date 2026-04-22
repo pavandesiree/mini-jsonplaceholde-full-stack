@@ -10,7 +10,7 @@ import {
     trovaUtenti, trovaUtentePerId, creaUtente,
     sostituisciUtente, aggiornaUtente, eliminaUtente
 } from "../database/queries/utenti.js";
-import { richiediAutenticazione } from "../middleware/autenticazione.js";
+import { richiediAutenticazione, richiediRuolo } from "../middleware/autenticazione.js";
 
 const router = Router();
 
@@ -189,7 +189,7 @@ router.patch("/:id", richiediAutenticazione, async (req, res) => {
 // Nota: grazie a ON DELETE CASCADE, eliminando un utente
 // vengono eliminati automaticamente anche i suoi post e commenti.
 
-router.delete("/:id", richiediAutenticazione, async (req, res) => {
+router.delete("/:id", richiediAutenticazione, richiediRuolo("admin"), async (req, res) => {
     try {
         const id = parseInt(req.params.id);
         const rimosso = await eliminaUtente(id);

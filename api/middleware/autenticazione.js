@@ -15,3 +15,12 @@ export function richiediAutenticazione(req, res, next) {
         return res.status(401).json({ errore: "Token non valido o scaduto" });
     }
 }
+
+export function richiediRuolo(...ruoliPermessi) {
+    return (req, res, next) => {
+        if (!req.utente || !ruoliPermessi.includes(req.utente.ruolo)) {
+            return res.status(403).json({ errore: "Permessi insufficienti" });
+        }
+        next();
+    };
+}
