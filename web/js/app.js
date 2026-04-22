@@ -69,11 +69,6 @@ document.getElementById("form-login").addEventListener("submit", async (e) => {
     }
 });
 
-function getUtenteLoggato() {
-    const raw = localStorage.getItem("utente");
-    return raw ? JSON.parse(raw) : null;
-}
-
 function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("utente");
