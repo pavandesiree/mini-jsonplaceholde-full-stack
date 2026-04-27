@@ -8,6 +8,8 @@ import routeUtenti from "./routes/utenti.js";
 import routePost from "./routes/post.js";
 import routeCommenti from "./routes/commenti.js";
 import authRouter from "./routes/auth.js";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 
 const app = express();
 const PORT = 3000;
@@ -49,6 +51,19 @@ app.use("/api/commenti", routeCommenti);
 
 //Per montare il router
 app.use("/api/auth", authRouter);
+
+//Es 15
+app.use(helmet());
+app.use(cors({
+    origin: process.env.CORS_ORIGIN,
+    credentials: true,
+}));
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: { errore: "Troppi tentativi, riprova tra 15 minuti" },
+});
+app.use("/api/auth/login", loginLimiter);
 
 // ============================================================
 // Route di benvenuto (home page)

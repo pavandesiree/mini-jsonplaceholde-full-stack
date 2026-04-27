@@ -72,8 +72,8 @@ export function mostraUtenti(utenti, contenitore, callbacks, utenteLoggato) {
                 ${puoEliminare ? `<button class="btn-pericolo" data-azione="elimina">Elimina</button>` : ""}
             </div>
         `;
-console.log("Utente loggato:", utenteLoggato);
-console.log("Ruolo:", utenteLoggato?.ruolo);
+//console.log("Utente loggato:", utenteLoggato);
+//console.log("Ruolo:", utenteLoggato?.ruolo);
         card.querySelector('[data-azione="vedi-post"]').addEventListener("click", () => {
             callbacks.onVediPost(utente);
         });
