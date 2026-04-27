@@ -44,7 +44,7 @@ function formattaData(dataInput) {
 // Utenti
 // ============================================================
 
-export function mostraUtenti(utenti, contenitore, callbacks) {
+export function mostraUtenti(utenti, contenitore, callbacks, utenteLoggato) {
     pulisciContenitore(contenitore);
 
     if (utenti.length === 0) {
@@ -52,13 +52,16 @@ export function mostraUtenti(utenti, contenitore, callbacks) {
         return;
     }
 
+    const puoEliminare = utenteLoggato && utenteLoggato.ruolo === "admin";
+
     utenti.forEach(utente => {
         const card = document.createElement("div");
         card.className = "card";
+
         card.innerHTML = `
             <h3>${utente.nome}</h3>
             <p>Email: ${utente.email}</p>
-            <p>Città: ${utente.citta || "Nessuna citta"}</p>
+            <p>Città: ${utente.citta || "Nessuna città"}</p>
             <p>CF: ${utente.codiceFiscale}</p>
             <p>Sesso: ${utente.sesso}</p>
             <p>Data nascita: ${formattaData(utente.dataNascita)}</p>
@@ -66,10 +69,11 @@ export function mostraUtenti(utenti, contenitore, callbacks) {
             <div class="azioni">
                 <button class="btn-primario" data-azione="vedi-post">Vedi Post</button>
                 <button class="btn-secondario" data-azione="modifica">Modifica</button>
-                <button class="btn-pericolo" data-azione="elimina">Elimina</button>
+                ${puoEliminare ? `<button class="btn-pericolo" data-azione="elimina">Elimina</button>` : ""}
             </div>
         `;
-
+console.log("Utente loggato:", utenteLoggato);
+console.log("Ruolo:", utenteLoggato?.ruolo);
         card.querySelector('[data-azione="vedi-post"]').addEventListener("click", () => {
             callbacks.onVediPost(utente);
         });
@@ -78,9 +82,11 @@ export function mostraUtenti(utenti, contenitore, callbacks) {
             callbacks.onModifica(utente);
         });
 
-        card.querySelector('[data-azione="elimina"]').addEventListener("click", () => {
-            callbacks.onElimina(utente.id);
-        });
+        if (puoEliminare) {
+            card.querySelector('[data-azione="elimina"]').addEventListener("click", () => {
+                callbacks.onElimina(utente.id);
+            });
+        }
 
         contenitore.appendChild(card);
     });
@@ -90,7 +96,7 @@ export function mostraUtenti(utenti, contenitore, callbacks) {
 // Post
 // ============================================================
 
-export function mostraPost(post, contenitore, callbacks) {
+export function mostraPost(post, contenitore, callbacks, utenteLoggato) {
     pulisciContenitore(contenitore);
 
     if (post.length === 0) {
@@ -100,6 +106,7 @@ export function mostraPost(post, contenitore, callbacks) {
 
     post.forEach(p => {
         const card = document.createElement("div");
+        const puoEliminare = utenteLoggato && (utenteLoggato.id === p.userId || utenteLoggato.ruolo === "admin");
         card.className = "card";
         card.innerHTML = `
             <h3>${p.titolo}</h3>
@@ -107,7 +114,7 @@ export function mostraPost(post, contenitore, callbacks) {
             ${p.creatoIl ? `<p>Creato il: ${formattaData(p.creatoIl)}</p>` : ""}
             <div class="azioni">
                 <button class="btn-primario" data-azione="vedi-commenti">Vedi Commenti</button>
-                <button class="btn-pericolo" data-azione="elimina">Elimina</button>
+                ${puoEliminare ? `<button class="btn-pericolo" data-azione="elimina">Elimina</button>` : ""}
             </div>
         `;
 
@@ -115,9 +122,11 @@ export function mostraPost(post, contenitore, callbacks) {
             callbacks.onVediCommenti(p);
         });
 
-        card.querySelector('[data-azione="elimina"]').addEventListener("click", () => {
-            callbacks.onElimina(p.id);
-        });
+        if (puoEliminare) {
+            card.querySelector('[data-azione="elimina"]').addEventListener("click", () => {
+                callbacks.onElimina(p.id);
+            });
+        }
 
         contenitore.appendChild(card);
     });

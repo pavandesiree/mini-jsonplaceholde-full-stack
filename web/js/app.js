@@ -69,10 +69,16 @@ document.getElementById("form-login").addEventListener("submit", async (e) => {
     }
 });
 
+function getUtenteLoggato() {
+    const raw = localStorage.getItem("utente");
+    return raw ? JSON.parse(raw) : null;
+}
+
 function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("utente");
     aggiornaStatoLogin();
+    aggiornaVisibilitaUI();
 }
 
 function aggiornaStatoLogin() {
@@ -80,6 +86,16 @@ function aggiornaStatoLogin() {
     document.getElementById("stato-login").textContent = utente
         ? `Loggato come ${utente.nome}`
         : "Non sei autenticato";
+}
+
+function aggiornaVisibilitaUI() {
+    const utente = getUtenteLoggato();
+    const formNuovoUtente = document.getElementById("form-utente");
+
+    if (formNuovoUtente) {
+        formNuovoUtente.style.display =
+            utente?.ruolo === "admin" ? "" : "none";
+    }
 }
 
 // ============================================================
@@ -157,11 +173,14 @@ document.getElementById("nav-logout").addEventListener("click", () => {
 async function caricaUtenti() {
     try {
         const utenti = await api.ottieniUtenti();
+        const utenteLoggato = getUtenteLoggato();
+
         ui.mostraUtenti(utenti, liste.utenti, {
             onVediPost: vediPostDiUtente,
             onElimina: eliminaUtente,
-            onModifica: attivaModificaUtente // AGGIUNTA
-        });
+            onModifica: attivaModificaUtente
+        }, utenteLoggato);
+
     } catch (err) {
         ui.mostraErrore(err.message, liste.utenti);
     }
@@ -170,11 +189,12 @@ async function caricaUtenti() {
 async function caricaPost(userId) {
     try {
         const risposta = await api.ottieniPost(userId, paginaCorrentePost, limitePost);
+        const utenteLoggato = getUtenteLoggato();
 
         ui.mostraPost(risposta.dati, liste.post, {
             onVediCommenti: vediCommentiDiPost,
             onElimina: eliminaPost,
-        });
+        }, utenteLoggato);
 
         renderPaginazione(risposta);
 
@@ -394,6 +414,8 @@ document.getElementById("form-commento").addEventListener("submit", async (e) =>
 
 caricaUtenti();
 aggiornaStatistiche();
+aggiornaStatoLogin();
+aggiornaVisibilitaUI();
 
 // ============================================================
 // Esercizio 4 - Filtro di ricerca utenti
