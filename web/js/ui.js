@@ -52,7 +52,7 @@ export function mostraUtenti(utenti, contenitore, callbacks, utenteLoggato) {
         return;
     }
 
-    const puoEliminare = utenteLoggato && utenteLoggato.ruolo === "admin";
+    const puoEliminare = utenteLoggato && utenteLoggato.ruolo == "admin";
 
     utenti.forEach(utente => {
         const card = document.createElement("div");

@@ -23,7 +23,7 @@ router.post("/login", async (req, res) => {
         { expiresIn: process.env.JWT_EXPIRES_IN }
     );
     
-    res.json({ token, utente: { id: utente.id, nome: utente.nome, email: utente.email} });
+    res.json({ token, utente: { id: utente.id, nome: utente.nome, email: utente.email, ruolo: utente.ruolo } });
 });
 
 export default router;
