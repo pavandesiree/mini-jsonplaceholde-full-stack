@@ -9,7 +9,7 @@ const BASE_URL = "http://localhost:3000/api";
 // Helper privato — wrappa fetch con JSON e gestione errori
 // ============================================================
 
-async function chiamataApi(percorso, opzioni = {}) {
+async function chiamataApi(percorso, opzioni = {}, tentativo = 1) {
     const token = localStorage.getItem("token");
     const headers = {
         "Content-Type": "application/json",
@@ -18,7 +18,10 @@ async function chiamataApi(percorso, opzioni = {}) {
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
     const risposta = await fetch(`${BASE_URL}${percorso}`, { ...opzioni, headers });
-    if (!risposta.ok) throw new Error((await risposta.json()).errore);
+    if (risposta.status === 401 && tentativo === 1) {
+        const ok = await tentaRefresh();
+        if (ok) return chiamataApi(percorso, opzioni, 2);
+    }
     return risposta.json();
 }
 

@@ -17,13 +17,35 @@ router.post("/login", async (req, res) => {
     const valida = await bcrypt.compare(password, utente.password);
     if (!valida) return res.status(401).json({ errore: "Credenziali non valide" });
 
-    const token = jwt.sign(
-        { id: utente.id, email: utente.email, ruolo: utente.ruolo },
-        process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN }
-    );
+    const accessToken = jwt.sign({ id: utente.id, ruolo: utente.ruolo, email: utente.email, nome: utente.nome}, JWT_SECRET, { expiresIn: "15m" });
+    const refreshToken = crypto.randomUUID();
+    await salvaRefreshToken(utente.id, refreshToken, scadenza7giorni);
+    res.json({ accessToken, refreshToken, utente });
     
-    res.json({ token, utente: { id: utente.id, nome: utente.nome, email: utente.email, ruolo: utente.ruolo } });
+});
+
+router.post("/refresh", async (req, res) => {
+    const { refreshToken } = req.body;
+    const record = await trovaRefreshToken(refreshToken);
+    if (!record || new Date(record.scadenza) < new Date()) {
+        return res.status(401).json({ errore: "Refresh token non valido o scaduto" });
+    }
+    const utente = await trovaUtentePerId(record.utenteId);
+    const accessToken = jwt.sign({ id: utente.id, ruolo: utente.ruolo, email: utente.email, nome: utente.nome}, JWT_SECRET, { expiresIn: "15m" });
+    res.json({ accessToken });
+});
+
+router.post("/logout", async (req, res) => {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+        return res.status(400).json({ errore: "Refresh token mancante" });
+    }
+    const record = await trovaRefreshToken(refreshToken);
+    if (!record) {
+        return res.status(200).json({ messaggio: "Logout effettuato" });
+    }
+    await eliminaRefreshToken(refreshToken);
+    res.status(200).json({ messaggio: "Logout effettuato" });
 });
 
 export default router;
