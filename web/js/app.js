@@ -64,6 +64,8 @@ document.getElementById("form-login").addEventListener("submit", async (e) => {
         localStorage.setItem("token", token);
         localStorage.setItem("utente", JSON.stringify(utente));
         aggiornaStatoLogin();
+        aggiornaVisibilitaUI();
+        await caricaUtenti();
     } catch (errore) {
         alert("Login fallito: " + errore.message);
     }
