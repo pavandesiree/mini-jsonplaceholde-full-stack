@@ -52,7 +52,7 @@ export function mostraUtenti(utenti, contenitore, callbacks, utenteLoggato) {
         return;
     }
 
-    const puoEliminare = utenteLoggato && utenteLoggato.ruolo == "admin";
+    const isAdmin = utenteLoggato && utenteLoggato.ruolo === "admin";
 
     utenti.forEach(utente => {
         const card = document.createElement("div");
@@ -68,8 +68,8 @@ export function mostraUtenti(utenti, contenitore, callbacks, utenteLoggato) {
             <p>Telefono: ${utente.telefono || "N/D"}</p>
             <div class="azioni">
                 <button class="btn-primario" data-azione="vedi-post">Vedi Post</button>
-                <button class="btn-secondario" data-azione="modifica">Modifica</button>
-                ${puoEliminare ? `<button class="btn-pericolo" data-azione="elimina">Elimina</button>` : ""}
+                ${isAdmin ? `<button class="btn-secondario" data-azione="modifica">Modifica</button>` : ""}
+                ${isAdmin ? `<button class="btn-pericolo" data-azione="elimina">Elimina</button>` : ""}
             </div>
         `;
 //console.log("Utente loggato:", utenteLoggato);
@@ -78,14 +78,14 @@ export function mostraUtenti(utenti, contenitore, callbacks, utenteLoggato) {
             callbacks.onVediPost(utente);
         });
 
+        if (isAdmin) {
         card.querySelector('[data-azione="modifica"]').addEventListener("click", () => {
             callbacks.onModifica(utente);
         });
 
-        if (puoEliminare) {
-            card.querySelector('[data-azione="elimina"]').addEventListener("click", () => {
-                callbacks.onElimina(utente.id);
-            });
+        card.querySelector('[data-azione="elimina"]').addEventListener("click", () => {
+            callbacks.onElimina(utente.id);
+        });
         }
 
         contenitore.appendChild(card);

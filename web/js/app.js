@@ -60,10 +60,12 @@ document.getElementById("form-login").addEventListener("submit", async (e) => {
     const email = document.getElementById("login-email").value;
     const password = document.getElementById("login-password").value;
     try {
-        const { token, utente } = await api.login(email, password);
-        localStorage.setItem("token", token);
+        const { utente } = await api.login(email, password);
         localStorage.setItem("utente", JSON.stringify(utente));
         aggiornaStatoLogin();
+        aggiornaVisibilitaUI();
+        await caricaUtenti();
+        document.getElementById("form-login").reset();
     } catch (errore) {
         alert("Login fallito: " + errore.message);
     }
@@ -75,10 +77,14 @@ function getUtenteLoggato() {
 }
 
 function logout() {
-    localStorage.removeItem("token");
+    api.logout();
     localStorage.removeItem("utente");
     aggiornaStatoLogin();
     aggiornaVisibilitaUI();
+    annullaModifica();
+    document.getElementById("form-utente").reset();
+    document.getElementById("form-login").reset();
+    caricaUtenti();
 }
 
 function aggiornaStatoLogin() {
@@ -206,10 +212,9 @@ async function caricaPost(userId) {
 async function caricaCommenti(postId) {
     try {
         const commenti = await api.ottieniCommenti(postId);
-        const utenteLoggato = getUtenteLoggato();
         ui.mostraCommenti(commenti, liste.commenti, {
             onElimina: eliminaCommento,
-        }, utenteLoggato);
+        });
     } catch (err) {
         ui.mostraErrore(err.message, liste.commenti);
     }
