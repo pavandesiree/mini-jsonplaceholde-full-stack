@@ -52,7 +52,7 @@ export function mostraUtenti(utenti, contenitore, callbacks, utenteLoggato) {
         return;
     }
 
-    const isAdmin = utenteLoggato && utenteLoggato.ruolo === "admin";
+    const puoEliminare = utenteLoggato && utenteLoggato.ruolo == "admin";
 
     utenti.forEach(utente => {
         const card = document.createElement("div");
@@ -68,19 +68,21 @@ export function mostraUtenti(utenti, contenitore, callbacks, utenteLoggato) {
             <p>Telefono: ${utente.telefono || "N/D"}</p>
             <div class="azioni">
                 <button class="btn-primario" data-azione="vedi-post">Vedi Post</button>
-                ${isAdmin ? `<button class="btn-secondario" data-azione="modifica">Modifica</button>` : ""}
-                ${isAdmin ? `<button class="btn-pericolo" data-azione="elimina">Elimina</button>` : ""}
+                <button class="btn-secondario" data-azione="modifica">Modifica</button>
+                ${puoEliminare ? `<button class="btn-pericolo" data-azione="elimina">Elimina</button>` : ""}
             </div>
         `;
+//console.log("Utente loggato:", utenteLoggato);
+//console.log("Ruolo:", utenteLoggato?.ruolo);
         card.querySelector('[data-azione="vedi-post"]').addEventListener("click", () => {
             callbacks.onVediPost(utente);
         });
 
-        if (isAdmin) {
-            card.querySelector('[data-azione="modifica"]').addEventListener("click", () => {
-                callbacks.onModifica(utente);
-            });
+        card.querySelector('[data-azione="modifica"]').addEventListener("click", () => {
+            callbacks.onModifica(utente);
+        });
 
+        if (puoEliminare) {
             card.querySelector('[data-azione="elimina"]').addEventListener("click", () => {
                 callbacks.onElimina(utente.id);
             });
@@ -134,7 +136,7 @@ export function mostraPost(post, contenitore, callbacks, utenteLoggato) {
 // Commenti
 // ============================================================
 
-export function mostraCommenti(commenti, contenitore, callbacks) {
+export function mostraCommenti(commenti, contenitore, callbacks, utenteLoggato) {
     pulisciContenitore(contenitore);
 
     if (commenti.length === 0) {
@@ -145,19 +147,24 @@ export function mostraCommenti(commenti, contenitore, callbacks) {
     commenti.forEach(c => {
         const card = document.createElement("div");
         card.className = "card";
+
+        const isAdmin = utenteLoggato?.ruolo === "admin";
+        const isAutore = utenteLoggato?.email === c.email;
+        const puoEliminare = isAdmin || isAutore;
+
         card.innerHTML = `
             <h3>${c.nome}</h3>
             <p>${c.email}</p>
             <p>${c.corpo}</p>
             ${c.creatoIl ? `<p>Creato il: ${formattaData(c.creatoIl)}</p>` : ""}
-            <div class="azioni">
-                <button class="btn-pericolo" data-azione="elimina">Elimina</button>
-            </div>
+            ${puoEliminare ? `<div class="azioni"><button class="btn-pericolo" data-azione="elimina">Elimina</button></div>` : ""}
         `;
 
-        card.querySelector('[data-azione="elimina"]').addEventListener("click", () => {
-            callbacks.onElimina(c.id);
-        });
+        if (puoEliminare) {
+            card.querySelector('[data-azione="elimina"]').addEventListener("click", () => {
+                callbacks.onElimina(c.id);
+            });
+        }
 
         contenitore.appendChild(card);
     });

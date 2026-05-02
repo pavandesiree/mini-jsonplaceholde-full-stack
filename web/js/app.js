@@ -64,8 +64,6 @@ document.getElementById("form-login").addEventListener("submit", async (e) => {
         localStorage.setItem("token", token);
         localStorage.setItem("utente", JSON.stringify(utente));
         aggiornaStatoLogin();
-        aggiornaVisibilitaUI();
-        await caricaUtenti();
     } catch (errore) {
         alert("Login fallito: " + errore.message);
     }
@@ -208,9 +206,10 @@ async function caricaPost(userId) {
 async function caricaCommenti(postId) {
     try {
         const commenti = await api.ottieniCommenti(postId);
+        const utenteLoggato = getUtenteLoggato();
         ui.mostraCommenti(commenti, liste.commenti, {
             onElimina: eliminaCommento,
-        });
+        }, utenteLoggato);
     } catch (err) {
         ui.mostraErrore(err.message, liste.commenti);
     }

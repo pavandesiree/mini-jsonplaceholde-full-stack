@@ -1,8 +1,4 @@
 // routes/commenti.js — Route per la risorsa Commenti
-//
-// Endpoint completo: /api/commenti (il prefisso è montato in server.js)
-//
-// Versione aggiornata: usa MySQL invece degli array in memoria.
 
 import { Router } from "express";
 import {
@@ -13,11 +9,7 @@ import { richiediAutenticazione } from "../middleware/autenticazione.js";
 
 const router = Router();
 
-// ============================================================
-// GET /api/commenti — Lista tutti i commenti
-// ============================================================
-// Filtro opzionale: /api/commenti?postId=4
-
+// GET /api/commenti
 router.get("/", async (req, res) => {
     try {
         const { postId } = req.query;
@@ -29,21 +21,14 @@ router.get("/", async (req, res) => {
     }
 });
 
-// ============================================================
-// GET /api/commenti/:id — Singolo commento
-// ============================================================
-
+// GET /api/commenti/:id
 router.get("/:id", async (req, res) => {
     try {
         const id = parseInt(req.params.id);
         const commento = await trovaCommentoPerId(id);
-
         if (!commento) {
-            return res.status(404).json({
-                errore: `Commento con id ${id} non trovato`
-            });
+            return res.status(404).json({ errore: `Commento con id ${id} non trovato` });
         }
-
         res.json(commento);
     } catch (errore) {
         console.error("Errore GET /api/commenti/:id:", errore);
@@ -51,21 +36,15 @@ router.get("/:id", async (req, res) => {
     }
 });
 
-// ============================================================
-// POST /api/commenti — Crea un nuovo commento
-// ============================================================
-// Campi obbligatori nel body: "postId", "nome", "email", "corpo"
-
+// POST /api/commenti
 router.post("/", richiediAutenticazione, async (req, res) => {
     try {
         const { postId, nome, email, corpo } = req.body;
-
         if (!postId || !nome || !email || !corpo) {
             return res.status(400).json({
                 errore: "I campi 'postId', 'nome', 'email' e 'corpo' sono obbligatori"
             });
         }
-
         const nuovoCommento = await creaCommento({ postId, nome, email, corpo });
         res.status(201).json(nuovoCommento);
     } catch (errore) {
@@ -74,30 +53,20 @@ router.post("/", richiediAutenticazione, async (req, res) => {
     }
 });
 
-// ============================================================
-// PUT /api/commenti/:id — Sostituisce un commento
-// ============================================================
-// Campi obbligatori nel body: "postId", "nome", "email", "corpo"
-
+// PUT /api/commenti/:id
 router.put("/:id", richiediAutenticazione, async (req, res) => {
     try {
         const id = parseInt(req.params.id);
         const { postId, nome, email, corpo } = req.body;
-
         if (!postId || !nome || !email || !corpo) {
             return res.status(400).json({
                 errore: "I campi 'postId', 'nome', 'email' e 'corpo' sono obbligatori"
             });
         }
-
         const aggiornato = await sostituisciCommento(id, { postId, nome, email, corpo });
-
         if (!aggiornato) {
-            return res.status(404).json({
-                errore: `Commento con id ${id} non trovato`
-            });
+            return res.status(404).json({ errore: `Commento con id ${id} non trovato` });
         }
-
         res.json(aggiornato);
     } catch (errore) {
         console.error("Errore PUT /api/commenti/:id:", errore);
@@ -105,23 +74,15 @@ router.put("/:id", richiediAutenticazione, async (req, res) => {
     }
 });
 
-// ============================================================
-// PATCH /api/commenti/:id — Aggiorna parzialmente
-// ============================================================
-
+// PATCH /api/commenti/:id
 router.patch("/:id", richiediAutenticazione, async (req, res) => {
     try {
         const id = parseInt(req.params.id);
         const { postId, nome, email, corpo } = req.body;
-
         const commento = await aggiornaCommento(id, { postId, nome, email, corpo });
-
         if (!commento) {
-            return res.status(404).json({
-                errore: `Commento con id ${id} non trovato`
-            });
+            return res.status(404).json({ errore: `Commento con id ${id} non trovato` });
         }
-
         res.json(commento);
     } catch (errore) {
         console.error("Errore PATCH /api/commenti/:id:", errore);
@@ -129,21 +90,24 @@ router.patch("/:id", richiediAutenticazione, async (req, res) => {
     }
 });
 
-// ============================================================
-// DELETE /api/commenti/:id — Elimina un commento
-// ============================================================
-
+// DELETE /api/commenti/:id
+// Può eliminare: il proprietario del commento (stessa email) oppure un admin
 router.delete("/:id", richiediAutenticazione, async (req, res) => {
     try {
         const id = parseInt(req.params.id);
-        const rimosso = await eliminaCommento(id);
+        const commento = await trovaCommentoPerId(id);
 
-        if (!rimosso) {
-            return res.status(404).json({
-                errore: `Commento con id ${id} non trovato`
-            });
+        if (!commento) {
+            return res.status(404).json({ errore: `Commento con id ${id} non trovato` });
         }
 
+        const isAdmin = req.utente.ruolo === "admin";
+        const isAutore = req.utente.email === commento.email;
+        if (!isAdmin && !isAutore) {
+            return res.status(403).json({ errore: "Puoi eliminare solo i tuoi commenti" });
+        }
+
+        const rimosso = await eliminaCommento(id);
         res.json({ messaggio: "Commento eliminato", commento: rimosso });
     } catch (errore) {
         console.error("Errore DELETE /api/commenti/:id:", errore);
