@@ -80,14 +80,11 @@ function getUtenteLoggato() {
 }
 
 function logout() {
-    api.logout();
+    localStorage.removeItem("token");
     localStorage.removeItem("utente");
     aggiornaStatoLogin();
     aggiornaVisibilitaUI();
-    annullaModifica();
-    document.getElementById("form-utente").reset();
-    document.getElementById("form-login").reset();
-    caricaUtenti();
+    location.reload();
 }
 
 function aggiornaStatoLogin() {
