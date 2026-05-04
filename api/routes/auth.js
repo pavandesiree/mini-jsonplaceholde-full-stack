@@ -6,17 +6,9 @@ import { richiediAutenticazione } from "../middleware/autenticazione.js";
 
 const router = Router();
 
-// ============================================================
-// POST /api/auth/registrazione
-// ============================================================
-
 router.post("/registrazione", async (req, res) => {
     // validazione + creaUtente + firma token + risposta { token, utente }
 });
-
-// ============================================================
-// POST /api/auth/login
-// ============================================================
 
 router.post("/login", async (req, res) => {
     try {
@@ -27,14 +19,10 @@ router.post("/login", async (req, res) => {
         }
 
         const utente = await trovaUtentePerEmail(email);
-        if (!utente) {
-            return res.status(401).json({ errore: "Credenziali non valide" });
-        }
+        if (!utente) return res.status(401).json({ errore: "Credenziali non valide" });
 
         const valida = await bcrypt.compare(password, utente.password);
-        if (!valida) {
-            return res.status(401).json({ errore: "Credenziali non valide" });
-        }
+        if (!valida) return res.status(401).json({ errore: "Credenziali non valide" });
 
         const token = jwt.sign(
             { id: utente.id, email: utente.email, ruolo: utente.ruolo },
@@ -44,12 +32,7 @@ router.post("/login", async (req, res) => {
 
         res.json({
             token,
-            utente: {
-                id: utente.id,
-                nome: utente.nome,
-                email: utente.email,
-                ruolo: utente.ruolo
-            }
+            utente: { id: utente.id, nome: utente.nome, email: utente.email, ruolo: utente.ruolo }
         });
 
     } catch (errore) {
@@ -58,30 +41,14 @@ router.post("/login", async (req, res) => {
     }
 });
 
-// ============================================================
-// POST /api/auth/logout
-// ============================================================
-// Il token JWT è stateless: il logout lato server non può
-// invalidarlo. Il client deve semplicemente rimuoverlo dal
-// localStorage. Questa route conferma l'operazione.
-
 router.post("/logout", richiediAutenticazione, (req, res) => {
     res.json({ messaggio: "Logout effettuato con successo" });
 });
 
-// ============================================================
-// GET /api/auth/refresh
-// ============================================================
-// Verifica il token corrente e ne emette uno nuovo aggiornato.
-// Utile per prolungare la sessione senza rifare il login.
-
 router.get("/refresh", richiediAutenticazione, async (req, res) => {
     try {
         const utente = await trovaUtentePerId(req.utente.id);
-
-        if (!utente) {
-            return res.status(404).json({ errore: "Utente non trovato" });
-        }
+        if (!utente) return res.status(404).json({ errore: "Utente non trovato" });
 
         const token = jwt.sign(
             { id: utente.id, email: utente.email, ruolo: utente.ruolo },
@@ -91,12 +58,7 @@ router.get("/refresh", richiediAutenticazione, async (req, res) => {
 
         res.json({
             token,
-            utente: {
-                id: utente.id,
-                nome: utente.nome,
-                email: utente.email,
-                ruolo: utente.ruolo
-            }
+            utente: { id: utente.id, nome: utente.nome, email: utente.email, ruolo: utente.ruolo }
         });
 
     } catch (errore) {
