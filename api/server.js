@@ -54,10 +54,6 @@ app.use("/api/auth", authRouter);
 
 //Es 15
 app.use(helmet());
-app.use(cors({
-    origin: process.env.CORS_ORIGIN,
-    credentials: true,
-}));
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 5,

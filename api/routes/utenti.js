@@ -1,9 +1,4 @@
 // routes/utenti.js — Route per la risorsa Utenti
-//
-// Endpoint completo: /api/utenti (il prefisso è montato in server.js)
-//
-// Versione aggiornata: usa MySQL invece degli array in memoria.
-// Ogni handler è async e usa try/catch per gestire errori del database.
 
 import { Router } from "express";
 import {
@@ -14,14 +9,7 @@ import { richiediAutenticazione, richiediRuolo } from "../middleware/autenticazi
 
 const router = Router();
 
-// ============================================================
-// GET /api/utenti — Lista tutti gli utenti
-// ============================================================
-// Supporta un filtro opzionale per città: /api/utenti?citta=Roma
-//
-// Prima (array):    utenti.filter(u => u.citta === citta)
-// Adesso (MySQL):   SELECT * FROM utenti WHERE LOWER(citta) = LOWER(?)
-
+// GET /api/utenti
 router.get("/", async (req, res) => {
     try {
         const { citta } = req.query;
@@ -33,24 +21,14 @@ router.get("/", async (req, res) => {
     }
 });
 
-// ============================================================
-// GET /api/utenti/:id — Singolo utente
-// ============================================================
-//
-// Prima (array):    trovaPerId(utenti, id)
-// Adesso (MySQL):   SELECT * FROM utenti WHERE id = ?
-
+// GET /api/utenti/:id
 router.get("/:id", async (req, res) => {
     try {
         const id = parseInt(req.params.id);
         const utente = await trovaUtentePerId(id);
-
         if (!utente) {
-            return res.status(404).json({
-                errore: `Utente con id ${id} non trovato`
-            });
+            return res.status(404).json({ errore: `Utente con id ${id} non trovato` });
         }
-
         res.json(utente);
     } catch (errore) {
         console.error("Errore GET /api/utenti/:id:", errore);
@@ -58,42 +36,17 @@ router.get("/:id", async (req, res) => {
     }
 });
 
-// ============================================================
-// POST /api/utenti — Crea un nuovo utente
-// ============================================================
-// Campi obbligatori nel body: "nome", "email"
-// Campo opzionale: "citta" (default: stringa vuota "")
-//
-// Prima (array):    prossimoId("utenti") + utenti.push()
-// Adesso (MySQL):   INSERT INTO utenti (...) VALUES (?, ?, ?)
-//                   L'id viene generato da AUTO_INCREMENT
-
+// POST /api/utenti
 router.post("/", async (req, res) => {
     try {
         const { nome, email, password, citta, codiceFiscale, sesso, dataNascita, telefono } = req.body;
-
         if (!nome || !email || !password || !codiceFiscale || !sesso) {
-            return res.status(400).json({
-                errore: "Campi obbligatori: nome, email, password, codiceFiscale, sesso"
-            });
+            return res.status(400).json({ errore: "Campi obbligatori: nome, email, password, codiceFiscale, sesso" });
         }
-
         if (password.length < 8) {
-        return res.status(400).json({
-            errore: "La password deve essere di almeno 8 caratteri"
-        });
-}
-        
-        const nuovoUtente = await creaUtente({
-            nome,
-            email,
-            password,
-            citta,
-            codiceFiscale,
-            sesso,
-            dataNascita,
-            telefono
-        });
+            return res.status(400).json({ errore: "La password deve essere di almeno 8 caratteri" });
+        }
+        const nuovoUtente = await creaUtente({ nome, email, password, citta, codiceFiscale, sesso, dataNascita, telefono });
         res.status(201).json(nuovoUtente);
     } catch (errore) {
         console.error("Errore POST /api/utenti:", errore);
@@ -101,41 +54,18 @@ router.post("/", async (req, res) => {
     }
 });
 
-// ============================================================
-// PUT /api/utenti/:id — Sostituisce un utente
-// ============================================================
-// Campi obbligatori nel body: "nome", "email"
-//
-// Prima (array):    utenti[indice] = { id, nome, email, citta }
-// Adesso (MySQL):   UPDATE utenti SET nome=?, email=?, citta=? WHERE id=?
-
-router.put("/:id", richiediAutenticazione, async (req, res) => {
+// PUT /api/utenti/:id — solo admin
+router.put("/:id", richiediAutenticazione, richiediRuolo("admin"), async (req, res) => {
     try {
         const id = parseInt(req.params.id);
         const { nome, email, citta, codiceFiscale, sesso, dataNascita, telefono } = req.body;
-
         if (!nome || !email || !codiceFiscale || !sesso) {
-            return res.status(400).json({
-                errore: "Campi obbligatori: nome, email, codiceFiscale, sesso"
-            });
+            return res.status(400).json({ errore: "Campi obbligatori: nome, email, codiceFiscale, sesso" });
         }
-        
-        const aggiornato = await sostituisciUtente(id, {
-            nome,
-            email,
-            citta,
-            codiceFiscale,
-            sesso,
-            dataNascita,
-            telefono
-        });
-
+        const aggiornato = await sostituisciUtente(id, { nome, email, citta, codiceFiscale, sesso, dataNascita, telefono });
         if (!aggiornato) {
-            return res.status(404).json({
-                errore: `Utente con id ${id} non trovato`
-            });
+            return res.status(404).json({ errore: `Utente con id ${id} non trovato` });
         }
-
         res.json(aggiornato);
     } catch (errore) {
         console.error("Errore PUT /api/utenti/:id:", errore);
@@ -143,35 +73,15 @@ router.put("/:id", richiediAutenticazione, async (req, res) => {
     }
 });
 
-// ============================================================
-// PATCH /api/utenti/:id — Aggiorna parzialmente
-// ============================================================
-// Accetta uno o più campi. Aggiorna solo quelli presenti.
-//
-// Prima (array):    if (nome !== undefined) utente.nome = nome;
-// Adesso (MySQL):   UPDATE utenti SET <campo>=? WHERE id=? (query dinamica)
-
-router.patch("/:id", richiediAutenticazione, async (req, res) => {
+// PATCH /api/utenti/:id — solo admin
+router.patch("/:id", richiediAutenticazione, richiediRuolo("admin"), async (req, res) => {
     try {
         const id = parseInt(req.params.id);
         const { nome, email, citta, codiceFiscale, sesso, dataNascita, telefono } = req.body;
-
-        const utente = await aggiornaUtente(id, {
-            nome,
-            email,
-            citta,
-            codiceFiscale,
-            sesso,
-            dataNascita,
-            telefono
-        });
-
+        const utente = await aggiornaUtente(id, { nome, email, citta, codiceFiscale, sesso, dataNascita, telefono });
         if (!utente) {
-            return res.status(404).json({
-                errore: `Utente con id ${id} non trovato`
-            });
+            return res.status(404).json({ errore: `Utente con id ${id} non trovato` });
         }
-
         res.json(utente);
     } catch (errore) {
         console.error("Errore PATCH /api/utenti/:id:", errore);
@@ -179,27 +89,14 @@ router.patch("/:id", richiediAutenticazione, async (req, res) => {
     }
 });
 
-// ============================================================
-// DELETE /api/utenti/:id — Elimina un utente
-// ============================================================
-//
-// Prima (array):    utenti.splice(indice, 1)
-// Adesso (MySQL):   DELETE FROM utenti WHERE id = ?
-//
-// Nota: grazie a ON DELETE CASCADE, eliminando un utente
-// vengono eliminati automaticamente anche i suoi post e commenti.
-
+// DELETE /api/utenti/:id — solo admin
 router.delete("/:id", richiediAutenticazione, richiediRuolo("admin"), async (req, res) => {
     try {
         const id = parseInt(req.params.id);
         const rimosso = await eliminaUtente(id);
-
         if (!rimosso) {
-            return res.status(404).json({
-                errore: `Utente con id ${id} non trovato`
-            });
+            return res.status(404).json({ errore: `Utente con id ${id} non trovato` });
         }
-
         res.json({ messaggio: "Utente eliminato", utente: rimosso });
     } catch (errore) {
         console.error("Errore DELETE /api/utenti/:id:", errore);

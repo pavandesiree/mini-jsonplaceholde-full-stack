@@ -53,7 +53,7 @@ export async function trovaUtentePerId(id) {
 
 export async function trovaUtentePerEmail(email) {
     const [righe] = await pool.query(
-        `SELECT id, nome, email, password, citta, codiceFiscale, sesso, dataNascita, telefono, creatoIl 
+        `SELECT id, ruolo, nome, email, password, citta, codiceFiscale, sesso, dataNascita, telefono, creatoIl 
          FROM utenti 
          WHERE email = ?`,
         [email]

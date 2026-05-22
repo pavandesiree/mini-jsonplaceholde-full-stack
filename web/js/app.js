@@ -59,14 +59,17 @@ document.getElementById("form-login").addEventListener("submit", async (e) => {
     e.preventDefault();
     const email = document.getElementById("login-email").value;
     const password = document.getElementById("login-password").value;
+    console.log("Tentativo login con:", email, password);
     try {
-        const { token, utente } = await api.login(email, password);
-        localStorage.setItem("token", token);
+        const { utente } = await api.login(email, password);
         localStorage.setItem("utente", JSON.stringify(utente));
         aggiornaStatoLogin();
         aggiornaVisibilitaUI();
         await caricaUtenti();
+        document.getElementById("form-login").reset();
     } catch (errore) {
+        console.log("Errore completo:", errore);
+        console.log("Messaggio:", errore.message);
         alert("Login fallito: " + errore.message);
     }
 });
@@ -81,6 +84,7 @@ function logout() {
     localStorage.removeItem("utente");
     aggiornaStatoLogin();
     aggiornaVisibilitaUI();
+    location.reload();
 }
 
 function aggiornaStatoLogin() {
