@@ -3,7 +3,7 @@
 // Tutte le funzioni fetch sono qui. Nessun codice DOM.
 // Importa queste funzioni da app.js per ottenere/creare/eliminare dati.
 
-const BASE_URL = "http://localhost:3000/api";
+const BASE_URL = 'https://mini-jsonplaceholder-full-stack.onrender.com';
 
 // ============================================================
 // Helper privato — wrappa fetch con JSON e gestione errori
