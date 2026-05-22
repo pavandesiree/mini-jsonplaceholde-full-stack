@@ -3,13 +3,13 @@
 // Tutte le funzioni fetch sono qui. Nessun codice DOM.
 // Importa queste funzioni da app.js per ottenere/creare/eliminare dati.
 
-const BASE_URL = 'https://mini-jsonplaceholder-full-stack.onrender.com/api'
+const BASE_URL = "http://localhost:3000/api";
 
 // ============================================================
 // Helper privato — wrappa fetch con JSON e gestione errori
 // ============================================================
 
-async function chiamataApi(percorso, opzioni = {}, tentativo = 1) {
+async function chiamataApi(percorso, opzioni = {}) {
     const token = localStorage.getItem("token");
     const headers = {
         "Content-Type": "application/json",
@@ -18,10 +18,7 @@ async function chiamataApi(percorso, opzioni = {}, tentativo = 1) {
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
     const risposta = await fetch(`${BASE_URL}${percorso}`, { ...opzioni, headers });
-    if (risposta.status === 401 && tentativo === 1) {
-        const ok = await tentaRefresh();
-        if (ok) return chiamataApi(percorso, opzioni, 2);
-    }
+    if (!risposta.ok) throw new Error((await risposta.json()).errore);
     return risposta.json();
 }
 
